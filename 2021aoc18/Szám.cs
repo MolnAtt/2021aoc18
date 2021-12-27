@@ -11,10 +11,6 @@ namespace _2021aoc18
         Szám szülő;
         int mélység;
         int tartalom;
-        bool Levél { get => tartalom != -1; }
-
-
-
         public Szám(int tartalom, Szám szülő=null) : this(null, null, szülő, Mélység_származtatása(szülő), tartalom) { }
         public Szám((Szám, Szám) t, Szám szülő) : this(t.Item1, t.Item2, szülő, Mélység_származtatása(szülő), -1) { }
         public Szám(Szám bal, Szám jobb, Szám szülő, int mélység, int tartalom)
@@ -39,12 +35,12 @@ namespace _2021aoc18
         {
             if (bal != null) // nem írható át Óvatosannal, mert az már végtelen ciklushoz vezet!
             {
-                bal.szülő = this;
+                Szülő_Update(bal);
                 bal.Szülő_Teljes_Update();
             }
             if (jobb != null)
             {
-                jobb.szülő = this;
+                Szülő_Update(jobb);
                 jobb.Szülő_Teljes_Update();
             }
             return this;
@@ -88,6 +84,7 @@ namespace _2021aoc18
         }
 
         void Szülő_Update(Szám szám) => szám.szülő = this;
+        bool Levél { get => tartalom != -1; }
         bool Gyerek { get => szülő != null; }
         bool Balgyerek { get => Gyerek && szülő.bal == this; }
         bool Jobbgyerek { get => Gyerek && szülő.jobb == this; }
@@ -129,38 +126,8 @@ namespace _2021aoc18
 
         public Szám Legbalsó_nagy_szám() => Legbalsó_nagy_szám(10);
         Szám Legbalsó_nagy_szám(int n) => n <= tartalom ? this : (Levél ? null : Ha_itt_nincs_nagy_szám_jobbra_keresd(n, bal.Legbalsó_nagy_szám(n)));
-        /*
-        * /
-        Szám Legbalsó_nagy_szám(int n)
-        {
-            if (n <= tartalom)
-                return this;
-            if (Levél)
-                return null;
-            return Ha_itt_nincs_nagy_szám_jobbra_keresd(n,bal.Legbalsó_nagy_szám(n));
-        }
-        /*
-        */
         Szám Ha_itt_nincs_nagy_szám_jobbra_keresd(int n, Szám balresult) => balresult == null ? jobb.Legbalsó_nagy_szám(n) : balresult;
-        /*
-        Szám Ha_balra_nincs_jobbra_keresd(int n, Szám balresult)
-        {
-            if (balresult == null)
-                return jobb.Legbalsó_nagy_szám(n);
-            return balresult;
-        }
-        */
-
-        public void Diagnosztika()
-        {
-            //Console.WriteLine(ToGraphViz());
-            // Console.WriteLine($"==== {this} ====");
-            //Console.WriteLine($"Legbalsó egyszerű párja: {Legbalsó_levélszülő()}");
-            // Console.WriteLine($"Legbalsó nagy száma: {Legbalsó_nagy_szám()}");
-            Console.WriteLine($"Magnitúdó: {Magnitúdó} -- {this}");
-        }
-
-        
+        public void Diagnosztika() => Console.WriteLine($"Magnitúdó: {Magnitúdó} -- {this}");
     }
 
     static class Stringkiterjesztések
@@ -198,23 +165,10 @@ namespace _2021aoc18
                 {
                     Szám ij = tömb[i] + tömb[j];
                     Szám ji = tömb[j] + tömb[i];
-                    Console.WriteLine($"Magnitúdó = {ij.Magnitúdó} --- {tömb[i]}   +   {tömb[j]}   =   {ij}");
-                    Console.WriteLine($"Magnitúdó = {ji.Magnitúdó} --- {tömb[j]}   +   {tömb[i]}  ===   {ji}");
+//                    Console.WriteLine($"Magnitúdó = {ij.Magnitúdó} --- {tömb[i]}   +   {tömb[j]}  ==  {ij}");
+  //                  Console.WriteLine($"Magnitúdó = {ji.Magnitúdó} --- {tömb[j]}   +   {tömb[i]}  ==   {ji}");
                     result.Add(ij);
                     result.Add(ji);
-                }
-            return result;
-        }
-
-        public static List<(Szám, Szám)> Párok(this IEnumerable<Szám> lista)
-        {
-            List<(Szám, Szám)> result = new List<(Szám, Szám)>();
-            Szám[] tömb = lista.ToArray();
-            for (int i = 0; i < tömb.Length; i++)
-                for (int j = i + 1; j < tömb.Length; j++)
-                {
-                    result.Add((tömb[i], tömb[j]));
-                    result.Add((tömb[j], tömb[i]));
                 }
             return result;
         }
